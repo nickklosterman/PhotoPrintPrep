@@ -71,7 +71,7 @@ imageFileWildcard = "jpg files (*.jpg)|*.jpg|" \
                     "png files (*.png)|*.png|"\
                     "All files (*.*)|*.*|"
 
-dvdSlideshowScript = "dvd-slideshow files (*.txt)|*.txt|" \
+dvdSlideshowScript = "photo-print-prep files (*.txt)|*.txt|" \
                      "All files (*.*)|*.*|"
 
 def positiveOrZero(number):
@@ -410,7 +410,7 @@ class PictureControl(wx.Control):
             framePosStr = 'bottomright'
          else:
             # Remember that the percentage position in
-            # dvd-slideshow refers to the center point of the selection, which
+            # photo-print-prep refers to the center point of the selection, which
             # makes it more interesting -- more math :(
             centerx = x + (w/2)
             centery = y + (h/2)
@@ -554,6 +554,7 @@ class MainWindow(wx.Frame):
       menu.Append(ID_SAVE, "&Save", "Save the current script")
       menu.Append(ID_SAVEAS, "&Save as...", "Save script as another file")
       menu.AppendSeparator()
+      menu.Append(ID_EXECUTE, "&Crop files", "Start cropping files")
       menu.Append(ID_GENERATESLIDESHOW, "&Generate Slideshow...", "Start generating slideshow")
       menu.AppendSeparator()
       menu.Append(ID_EXIT, "E&xit", "Exit program")
@@ -657,17 +658,17 @@ class MainWindow(wx.Frame):
          # we set isUnsavedChanges to false rarely. We'll always set window title as well in this case
          self.isUnsavedChanges = False
          if self.scriptPath:
-            self.SetTitle('dvd-slideshow-editor - %s' % self.scriptPath)
+            self.SetTitle('Photo Print Prep - %s' % self.scriptPath)
          else:
-            self.SetTitle('dvd-slideshow-editor - untitled')
+            self.SetTitle('Photo Print Prep - untitled')
       else:
          # In this case, we set window title only when we transition from False
          if self.isUnsavedChanges == False:
             self.isUnsavedChanges = True
             if self.scriptPath:
-               self.SetTitle('dvd-slideshow-editor - %s *' % self.scriptPath)
+               self.SetTitle('Photo Print Prep - %s *' % self.scriptPath)
             else:
-               self.SetTitle('dvd-slideshow-editor - untitled *')
+               self.SetTitle('Photo Print Prep - untitled *')
 
    def isContinueOrPromptForUnsavedChanges(self):
       if self.isUnsavedChanges:
@@ -685,13 +686,13 @@ class MainWindow(wx.Frame):
 
    def onOpenFile(self, event):
       if self.isContinueOrPromptForUnsavedChanges():
-         dlg = wx.FileDialog(self, message="Choose a dvd-slideshow script", defaultDir=os.getcwd(),
+         dlg = wx.FileDialog(self, message="Choose a photo-print-prep script", defaultDir=os.getcwd(),
             defaultFile="", wildcard=dvdSlideshowScript, style=wx.OPEN | wx.CHANGE_DIR)
 
          # Show the dialog and retrieve the user response. If it is the OK response,
          # process the data.
          if dlg.ShowModal() == wx.ID_OK:
-            debug('Opening dvd-slideshow script: %s' % self.scriptPath)
+            debug('Opening photo-print-prep script: %s' % self.scriptPath)
             self.setScriptPathAndLoad(dlg.GetPath())
 
          dlg.Destroy()
@@ -705,14 +706,14 @@ class MainWindow(wx.Frame):
          self.onSaveAs(event)
 
    def onSaveAs(self, event):
-      dlg = wx.FileDialog(self, message="Save dvd-slideshow script as ...", defaultDir=os.getcwd(),
+      dlg = wx.FileDialog(self, message="Save photo-print-prep script as ...", defaultDir=os.getcwd(),
          defaultFile="", wildcard=dvdSlideshowScript, style=wx.SAVE | wx.CHANGE_DIR)
 
       # Show the dialog and retrieve the user response. If it is the OK response,
       # process the data.
       if dlg.ShowModal() == wx.ID_OK:
          self.scriptPath = dlg.GetPath()
-         debug('Saving dvd-slideshow script as %s' % self.scriptPath)
+         debug('Saving photo-print-prep script as %s' % self.scriptPath)
          self.onSave(event)
 
       dlg.Destroy()
@@ -981,13 +982,13 @@ class MainWindow(wx.Frame):
       os.unlink(tempFile)
 
    def execute_dvd_slideshow(self, args, dir):
-      # launch dvd-slideshow. The simplest way to do this that I can think
+      # launch photo-print-prep. The simplest way to do this that I can think
       # of is executing this inside a new terminal, but which terminal to use?
 
       if subprocess.call(['which', 'gnome-terminal']) == 0:
-         cmd = ['gnome-terminal', '-x', 'dvd-slideshow'] + args
+         cmd = ['gnome-terminal', '-x', 'photo-print-prep'] + args
       elif subprocess.call(['which', 'konsole']) == 0:
-         cmd = ['konsole', '-x', 'dvd-slideshow'] + args
+         cmd = ['konsole', '-x', 'photo-print-prep'] + args
       else:
          dlg = wx.MessageDialog(self, "Failed to find a terminal to use.\nPlease install gnome-terminal or konsole.", "Can't find terminal", wx.OK | wx.ICON_ERROR)
          dlg.ShowModal()
@@ -1021,7 +1022,7 @@ class MainWindow(wx.Frame):
       self.execute_dvd_slideshow([('-L', '-H')[event.GetId() == ID_POPUP_HQPREVIEW], '-f', tempFile], self.tempdir)
 
       # now call mplayer to view it
-      dlg = wx.MessageDialog(self, "Please click OK when dvd-slideshow is done", "Waiting for dvd-slideshow", wx.OK | wx.ICON_INFORMATION)
+      dlg = wx.MessageDialog(self, "Please click OK when photo-print-prep is done", "Waiting for photo-print-prep", wx.OK | wx.ICON_INFORMATION)
       isPreviewAgain = dlg.ShowModal()
       dlg.Destroy()
       while isPreviewAgain == wx.ID_OK:
@@ -1039,7 +1040,7 @@ class MainWindow(wx.Frame):
 
       self.execute_dvd_slideshow(['-H', '-f', self.scriptPath], os.path.dirname(self.scriptPath))
       time.sleep(5) # don't know why this is needed. Otherwise the terminal doesn't get launched
-      dlg = wx.MessageDialog(self, "Please click OK when dvd-slideshow is done", "Waiting for dvd-slideshow", wx.OK | wx.ICON_INFORMATION)
+      dlg = wx.MessageDialog(self, "Please click OK when photo-print-prep is done", "Waiting for photo-print-prep", wx.OK | wx.ICON_INFORMATION)
       dlg.ShowModal()
       dlg.Destroy()
 
@@ -1047,37 +1048,28 @@ class MainWindow(wx.Frame):
       info = wx.AboutDialogInfo()
       info.Name = ProgName
       info.Version = ProgVersion
-      info.Copyright = "(C) 2010 dvd-slideshow-editor's contributors"
+      info.Copyright = "(C) 2010 Photo Print Prep's contributors"
       info.Description = wordwrap(
-            "A GUI editor for dvd-slideshow script.\n\nUsage:\n\n"
+            "A GUI editor for photo-print-prep script.\n\nUsage:\n\n"
             "Left pane contains the raw script. You can edit this directly, and your change will be reflected on the right pane\n\n"
             "Right pane contains the sample picture and the effect bounding box. You can move and resize the box(es). By default, this will use keyword snap. Hold down alt for no snap. Hold down ctrl and alt for no snap and no aspect ratio\n",
             350, wx.ClientDC(self))
 
-      info.WebSite = ("http://code.google.com/p/dvd-slideshow-editor/", "dvd-slideshow-editor project page")
+      info.WebSite = ("http://code.google.com/p/Photo Print Prep/", "Photo Print Prep project page")
 
       info.License = "http://www.gnu.org/licenses/gpl.html"
 
       # Then we call wx.AboutBox giving it that info object
       wx.AboutBox(info)
 
-   # TODO
-   #def onAddPicts(self, event):
-   #   self.setUnsavedChanges(True)
-   #   pass
-   #def onAddSongs(self, event):
-   #   self.setUnsavedChanges(True)
-   #   pass
-   #def onEditPreferences(self, event):
-   #   pass
-
 def parseOptions(argv):
    """
    Given parse command line, return a tuple containing the options selected by user
    """
    # build option parser
-   optParser = optparse.OptionParser(prog = ProgName, description = "GUI editor for dvd-slideshow script", usage = "usage: %prog [options] [dvd-slideshow-script]")
-   optParser.add_option("-w", "--widescreen", action = "store_true", help = "widescreen (16:9). Default: 4.3")
+   optParser = optparse.OptionParser(prog = ProgName, description = "GUI editor for photo-print-prep script", usage = "usage: %prog [options] [photo-print-prep-script]")
+#   optParser.add_option("-w", "--widescreen", action = "store_true", help = "widescreen (16:9). Default: 4.3")
+   optParser.add_option("-i", "--international", action = "store_true", help = "international paper sizing")
    optParser.add_option("-v", "--verbose", action = "store_true", help = "verbose prints for debugging")
 
    # parse arguments and validate. Exit if not valid
@@ -1115,7 +1107,7 @@ def main(argv = None):
    random.seed()
 
    app = wx.PySimpleApp()
-   frame = MainWindow(None, wx.ID_ANY, "dvd-slideshow-editor", options, scriptPath)
+   frame = MainWindow(None, wx.ID_ANY, "Photo Print Prep", options, scriptPath)
    app.MainLoop()
 
    return 0
