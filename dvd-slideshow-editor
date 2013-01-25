@@ -321,6 +321,7 @@ class PictureControl(wx.Control):
       self.addBoxSelection(';'.join([p[2],p[3]]))
 
    def displayScriptLine(self, scriptLine):
+      print "displayScriptLine"
       lineElems = scriptLine.split(':')
       self.pictPath = getImageFromScriptLine(scriptLine)
       if self.pictPath:
@@ -873,6 +874,7 @@ class MainWindow(wx.Frame):
    def onLineFocused(self, event):
       self.currentFocused = event.m_itemIndex
       debug('currentFocused: %d' % self.currentFocused)
+
       self.imagePanel.displayScriptLine(self.constructScriptLine(self.currentFocused))
 
    def onLineEdited(self, event):
@@ -890,6 +892,7 @@ class MainWindow(wx.Frame):
 
    def onScriptRightClick(self, event):
       self.PopupMenu(self.popupMenu)
+      self.WX
 
    def onAddKenburns(self, event):
       def getRandomAroundAnchor(rrange, ranchor):
